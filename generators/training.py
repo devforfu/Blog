@@ -8,7 +8,7 @@ from Augmentor.Operations import Rotate, Flip
 from sklearn.preprocessing import LabelBinarizer
 
 
-PATH_TO_IMAGES = '/Users/ck/Code/Tasks/blog/generators/images'
+PATH_TO_IMAGES = './images'
 
 
 def dataset(root_folder, batch_size=32):
