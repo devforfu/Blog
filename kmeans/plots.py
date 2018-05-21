@@ -7,9 +7,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
-from .kmeans import read_csv
-from .kmeans import kmeans
-from .kmeans import assign_labels
+from kmeans import kmeans, assign_labels, read_csv
 
 
 DEFAULT_PALETTE = ['red', 'darkorange', 'royalblue', 'green', 'magenta', 'pink']

@@ -10,7 +10,7 @@ import csv
 import numpy as np
 
 
-def kmeans(X, n_clusters=5, n_restarts=10, max_iterations=300):
+def kmeans(X, n_clusters=5, n_restarts=10, max_iterations=300, history=False):
     """
     Applies K-Means clustering algorithm to numerical dataset represented as
     2-dimensional NumPy array.
@@ -22,6 +22,8 @@ def kmeans(X, n_clusters=5, n_restarts=10, max_iterations=300):
             returned. The algorithm is non-deterministic as soon as its result
             depends on centroids initialization.
         max_iterations: Maximum number of iterations per algorithm restart.
+        history: If True, then ALL labels assignments during the best restart
+            will be collected. (For visualizing purposes mostly).
 
     Returns:
         centroids (num_of_clusters, n_features): The 2D-array with centroids
@@ -35,16 +37,20 @@ def kmeans(X, n_clusters=5, n_restarts=10, max_iterations=300):
 
     best_centroids = None
     best_score = np.inf
+    best_history = []
     labels = None
 
     for i in range(n_restarts):
         centroids = generate_random_centroids(n_features, n_clusters)
         old_centroids = np.zeros_like(centroids)
         count = 0
+        training_history = []
 
         while not converged(old_centroids, centroids, count):
             old_centroids = centroids
             labels = assign_labels(X, centroids)
+            if history:
+                training_history.append((labels, centroids))
             centroids = calculate_centroids(X, labels, n_clusters)
             count += 1
 
@@ -52,6 +58,10 @@ def kmeans(X, n_clusters=5, n_restarts=10, max_iterations=300):
         if score < best_score:
             best_centroids = centroids
             best_score = score
+            best_history = training_history
+
+    if history:
+        return best_centroids, best_score, best_history
 
     return best_centroids, best_score
 
