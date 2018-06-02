@@ -4,22 +4,6 @@ from string import digits
 
 import graphviz
 import numpy as np
-from sklearn.datasets import load_iris
-from sklearn.tree import DecisionTreeClassifier, export_graphviz
-
-
-class Node:
-
-    def __init__(self, feature, value, classes, left=None, right=None):
-        self.feature = feature
-        self.value = value
-        self.classes = classes
-        self.left = left
-        self.right = right
-
-    @property
-    def is_leaf(self):
-        return self.left is None and self.right is None
 
 
 def node_id(size=20, chars=digits):
@@ -40,16 +24,21 @@ def create_graph(tree, output_file=None, rounded=True,
 
     def recurse(node, file):
         uid = node_id()
-        file.write('%s [label="feature %d"];\n' % (uid, node.feature))
-        edge = '%s -> %s [labeldistance=2.5, labelangle=45];\n'
 
-        if node.left is not None:
-            l_uid = recurse(node.left, file)
-            file.write(edge % (uid, l_uid))
+        if not hasattr(node, 'feature'):
+            file.write('%s [label="leaf: %s"];\n' % (uid, node))
 
-        if node.right is not None:
-            r_uid = recurse(node.right, file)
-            file.write(edge % (uid, r_uid))
+        else:
+            file.write('%s [label="feature %d"];\n' % (uid, node.feature))
+            edge = '%s -> %s [labeldistance=2.5, labelangle=45];\n'
+
+            if node.left is not None:
+                l_uid = recurse(node.left, file)
+                file.write(edge % (uid, l_uid))
+
+            if node.right is not None:
+                r_uid = recurse(node.right, file)
+                file.write(edge % (uid, r_uid))
 
         return uid
 
@@ -79,10 +68,12 @@ def get_color():
 
 def _color_brew(n):
     """Generate n colors with equally spaced hues.
+
     Parameters
     ----------
     n : int
         The number of colors required.
+
     Returns
     -------
     color_list : list, length n
@@ -115,23 +106,3 @@ def _color_brew(n):
         color_list.append(rgb)
 
     return color_list
-
-
-def main():
-    tree = Node(
-        feature=3, value=25.4,
-        left=Node(feature=1, value=1.97),
-        right=Node(
-            feature=2, value=21.24,
-            left=Node(
-                feature=8, value=5.6,
-                left=Node(feature=11, value=9.5)),
-            right=Node(feature=5, value=7.39)))
-
-    dot_data = create_graph(tree)
-    graph = graphviz.Source(dot_data)
-    graph.render('tree')
-
-
-if __name__ == '__main__':
-    main()

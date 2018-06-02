@@ -2,8 +2,10 @@ import csv
 from collections import Counter
 from os.path import join, dirname
 
+import graphviz
 import numpy as np
 
+from plots import create_graph
 from decision_tree import learn_tree
 
 
@@ -49,9 +51,13 @@ def encode_labels(y):
 
 
 def main():
-    data_path = join(dirname(__file__), 'datasets', 'blobs.csv')
+    data_path = join(dirname(__file__), 'datasets', 'wine.csv')
     feature_names, X, y = read_csv(data_path)
+    y, encoder = encode_labels(y)
     tree = learn_tree(X, y)
+    dot_data = create_graph(tree)
+    graph = graphviz.Source(dot_data)
+    graph.render('tree')
 
 
 if __name__ == '__main__':

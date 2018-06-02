@@ -1,4 +1,9 @@
+from collections import namedtuple
+
 import numpy as np
+
+
+Node = namedtuple('Node', 'feature value gini classes depth left right')
 
 
 def learn_tree(X, y, max_depth=5, min_split_size=10,
@@ -10,6 +15,7 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
 
     """
     features = np.arange(X.shape[1])
+    min_leaf_size = min_leaf_size or 1
 
 
     def learn(x_index, y_index, depth):
@@ -31,7 +37,7 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
 
         """
         shortcut = (
-            all_same(y_index) or
+            single_class_node(y_index) or
             too_small_for_split(x_index) or
             max_depth_exceeded(depth))
 
@@ -59,7 +65,7 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
                 gini = gini_index(y_index, classes, left)
                 if gini < best_gini:
                     best_gini = gini
-                    best_feature = best_feature
+                    best_feature = feature
                     best_split = left
                     best_value = threshold
 
@@ -71,10 +77,15 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         y_left = y_index[best_split]
         y_right = y_index[~best_split]
 
-        node = Node(best_feature, best_value, classes, best_gini)
-        node.left = learn(x_left, y_left, depth + 1)
-        node.right = learn(x_right, y_right, depth + 1)
-        return node
+        left = learn(x_left, y_left, depth + 1)
+        right = learn(x_right, y_right, depth + 1)
+
+        if left.value == right.value:
+            return left.value
+
+
+        return Node(feature=best_feature, value=best_value, classes=classes,
+                    gini=best_gini, depth=depth, left=left, right=right)
 
 
     def gini_index(node_subset, classes, left):
@@ -117,6 +128,13 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         return np.argmax(np.bincount(arr.astype(int)))
 
 
+    def single_class_node(y_index):
+        """
+        Returns true if all elements of sequence are equal to the same value.
+        """
+        return np.unique(y[y_index]).shape[0] == 1
+
+
     def too_small_for_split(index):
         """
         Checks if node is too small to being split.
@@ -139,9 +157,6 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         parent nodes to group them into child node. True values select values
         of left node, while False values - for the right one.
         """
-        if min_leaf_size is None:
-            return False
-
         total = len(index)
         left_node_samples = index.sum()
         right_node_samples = total - left_node_samples
@@ -159,30 +174,3 @@ def mask(condition, arr):
     Returns a mask selecting array values meeting the condition.
     """
     return np.ma.masked_where(condition, arr).mask
-
-
-def all_same(seq):
-    """
-    Returns true if all elements of sequence are equal to the same value.
-    """
-    return len(set(seq)) == 1
-
-
-class Node:
-
-    def __init__(self, feature, value, classes, gini, left=None, right=None):
-        self.feature = feature
-        self.value = value
-        self.classes = classes
-        self.gini = gini
-        self.left = left
-        self.right = right
-
-    @property
-    def is_leaf(self):
-        return self.left is None and self.right is None
-
-
-if __name__ == '__main__':
-    main()
-
