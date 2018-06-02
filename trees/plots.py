@@ -17,7 +17,7 @@ def create_graph(tree, output_file=None, rounded=True,
     styling = {
         'shape': 'box',
         'style': 'filled, rounded',
-        'color': 'white'}
+        'color': 'black'}
 
     # n_colors = len(np.unique(tree.classes))
     # colors = _color_brew(n_colors)
@@ -26,10 +26,10 @@ def create_graph(tree, output_file=None, rounded=True,
         uid = node_id()
 
         if not hasattr(node, 'feature'):
-            file.write('%s [label="leaf: %s"];\n' % (uid, node))
+            file.write('%s [label="leaf: %s", fillcolor="white"];\n' % (uid, node))
 
         else:
-            file.write('%s [label="feature %d"];\n' % (uid, node.feature))
+            file.write('%s [label="feature %d", fillcolor="white"];\n' % (uid, node.feature))
             edge = '%s -> %s [labeldistance=2.5, labelangle=45];\n'
 
             if node.left is not None:

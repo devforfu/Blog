@@ -80,9 +80,8 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         left = learn(x_left, y_left, depth + 1)
         right = learn(x_right, y_right, depth + 1)
 
-        if left.value == right.value:
-            return left.value
-
+        if same_values(left, right):
+            return get_value(left)
 
         return Node(feature=best_feature, value=best_value, classes=classes,
                     gini=best_gini, depth=depth, left=left, right=right)
@@ -174,3 +173,17 @@ def mask(condition, arr):
     Returns a mask selecting array values meeting the condition.
     """
     return np.ma.masked_where(condition, arr).mask
+
+
+def same_values(left, right):
+    if isinstance(left, Node) and isinstance(right, Node):
+        return left.value == right.value
+    elif isinstance(left, Node):
+        return left.value == right
+    elif isinstance(right, Node):
+        return left == right.value
+    return left == right
+
+
+def get_value(node):
+    return node.value if isinstance(node, Node) else node
