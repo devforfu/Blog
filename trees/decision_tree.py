@@ -1,13 +1,43 @@
-from collections import namedtuple
+from collections import Counter
 
 import numpy as np
 
 
-Node = namedtuple('Node', 'feature value gini classes depth left right')
+class _Node:
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def is_leaf(self):
+        return False
+
+
+class Node(_Node):
+    def __init__(self, feature, value, gini, counts, depth, left, right):
+        super().__init__(value)
+        self.feature = feature
+        self.value = value
+        self.gini = gini
+        self.counts = counts
+        self.depth = depth
+        self.left = left
+        self.right = right
+
+
+class Leaf(_Node):
+
+    @property
+    def is_leaf(self):
+        return True
+
+    def __eq__(self, other):
+        if other.is_leaf:
+            return self.value == other.value
+        return False
 
 
 def learn_tree(X, y, max_depth=5, min_split_size=10,
-               features_subset_size=None, min_leaf_size=None):
+               features_subset_size=None, min_leaf_size=None) -> Node:
     """Creates a decision tree based on provided dataset.
 
     Returns:
@@ -48,7 +78,9 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         best_feature = None
         best_split = None
         best_value = None
-        classes = np.unique(y[y_index])
+        targets = y[y_index]
+        counts = Counter(targets)
+        classes = np.unique(targets)
 
         if features_subset_size is None:
             considered_features = features
@@ -80,10 +112,10 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         left = learn(x_left, y_left, depth + 1)
         right = learn(x_right, y_right, depth + 1)
 
-        if same_values(left, right):
-            return get_value(left)
+        if left.is_leaf and right.is_leaf and left == right:
+            return Leaf(left.value)
 
-        return Node(feature=best_feature, value=best_value, classes=classes,
+        return Node(feature=best_feature, value=best_value, counts=counts,
                     gini=best_gini, depth=depth, left=left, right=right)
 
 
@@ -124,7 +156,8 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         Returns the majority value of an array.
         """
         arr = y[index]
-        return np.argmax(np.bincount(arr.astype(int)))
+        value = np.argmax(np.bincount(arr.astype(int)))
+        return Leaf(value)
 
 
     def single_class_node(y_index):
@@ -173,17 +206,3 @@ def mask(condition, arr):
     Returns a mask selecting array values meeting the condition.
     """
     return np.ma.masked_where(condition, arr).mask
-
-
-def same_values(left, right):
-    if isinstance(left, Node) and isinstance(right, Node):
-        return left.value == right.value
-    elif isinstance(left, Node):
-        return left.value == right
-    elif isinstance(right, Node):
-        return left == right.value
-    return left == right
-
-
-def get_value(node):
-    return node.value if isinstance(node, Node) else node

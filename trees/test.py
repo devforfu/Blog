@@ -47,15 +47,15 @@ def encode_labels(y):
     unique_values = sorted(set(y))
     encoder = {key: i for i, key in enumerate(unique_values)}
     labels = np.array([encoder[target] for target in y])
-    return labels, encoder
+    return labels, encoder, unique_values
 
 
 def main():
     data_path = join(dirname(__file__), 'datasets', 'wine.csv')
     feature_names, X, y = read_csv(data_path)
-    y, encoder = encode_labels(y)
+    y, encoder, class_names = encode_labels(y)
     tree = learn_tree(X, y)
-    dot_data = create_graph(tree)
+    dot_data = create_graph(tree, feature_names, class_names)
     graph = graphviz.Source(dot_data)
     graph.render('tree')
 
