@@ -2,7 +2,6 @@ import random
 from io import StringIO
 from string import digits
 
-import graphviz
 import numpy as np
 
 
@@ -27,7 +26,7 @@ def create_graph(tree, feature_names, class_names, output_file=None):
         label = node_to_str(node)
         color = get_node_color(node)
 
-        file.write('%s [label="%s", fillcolor="%s"];\n' % (uid, label, color))
+        file.write(f'{uid} [label="{label}", fillcolor="{color}"];\n')
 
         if not node.is_leaf:
             edge = '%s -> %s [label=%s, labeldistance=2.5, labelangle=45];\n'
@@ -55,10 +54,10 @@ def create_graph(tree, feature_names, class_names, output_file=None):
             [(category, num_of_samples)] = node.counts.most_common(1)
             ratio = num_of_samples / total
             lines = [
-                'samples: %s' % total,
-                'gini: %2.2f' % node.gini,
-                'ratio: %2.2f' % ratio,
-                '%s <= %2.2f' % (name, node.value)]
+                f'samples: {total}',
+                f'gini: {node.gini:2.2f}',
+                f'ratio: {ratio:2.2f}',
+                f'{name} <= {node.value:2.2f}']
             return '\n'.join(lines)
 
 
@@ -81,7 +80,7 @@ def create_graph(tree, feature_names, class_names, output_file=None):
         else:
             fp = open(output_file, 'w', encoding='utf-8')
             opened_file = True
-        styles = ['%s="%s"' % (k, v) for k, v in styling.items()]
+        styles = [f'{k}="{v}"' for k, v in styling.items()]
         fp.write('digraph Tree {\n')
         fp.write('node [%s];\n' % ', '.join(styles))
         create(tree, fp)

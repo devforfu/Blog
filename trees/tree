@@ -1,0 +1,39 @@
+digraph Tree {
+node [shape="box", style="filled, rounded", color="black"];
+21266469118136183964 [label="samples: 142
+gini: 0.37
+ratio: 0.38
+Proline <= 750.00", fillcolor="#e5813960"];
+46859130701182769109 [label="samples: 84
+gini: 0.19
+ratio: 0.61
+Flavanoids <= 1.31", fillcolor="#39e5819a"];
+97336504378831869756 [label="samples: 36
+gini: 0.00
+ratio: 0.83
+Intensity <= 3.60", fillcolor="#8139e5d4"];
+51661741401513433086 [label="2.0", fillcolor="#39e581"];
+97336504378831869756 -> 51661741401513433086 [label=yes, labeldistance=2.5, labelangle=45];
+78434953664946296730 [label="3.0", fillcolor="#8139e5"];
+97336504378831869756 -> 78434953664946296730 [label=no, labeldistance=2.5, labelangle=45];
+46859130701182769109 -> 97336504378831869756 [label=yes, labeldistance=2.5, labelangle=45];
+13132958293977579022 [label="2.0", fillcolor="#39e581"];
+46859130701182769109 -> 13132958293977579022 [label=no, labeldistance=2.5, labelangle=45];
+21266469118136183964 -> 46859130701182769109 [label=yes, labeldistance=2.5, labelangle=45];
+54938213943655772924 [label="samples: 58
+gini: 0.09
+ratio: 0.90
+Total phenols <= 1.90", fillcolor="#e58139e4"];
+52542692819588932222 [label="3.0", fillcolor="#8139e5"];
+54938213943655772924 -> 52542692819588932222 [label=yes, labeldistance=2.5, labelangle=45];
+09887454673693614017 [label="samples: 54
+gini: 0.00
+ratio: 0.96
+Magnesium <= 132.00", fillcolor="#e58139f5"];
+07151666006750891971 [label="1.0", fillcolor="#e58139"];
+09887454673693614017 -> 07151666006750891971 [label=yes, labeldistance=2.5, labelangle=45];
+51197204711731211207 [label="2.0", fillcolor="#39e581"];
+09887454673693614017 -> 51197204711731211207 [label=no, labeldistance=2.5, labelangle=45];
+54938213943655772924 -> 09887454673693614017 [label=no, labeldistance=2.5, labelangle=45];
+21266469118136183964 -> 54938213943655772924 [label=no, labeldistance=2.5, labelangle=45];
+}

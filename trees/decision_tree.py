@@ -11,6 +11,11 @@ class _Node:
     def is_leaf(self):
         return False
 
+    def __eq__(self, other):
+        if self.is_leaf and other.is_leaf:
+            return self.value == other.value
+        return False
+
 
 class Node(_Node):
     def __init__(self, feature, value, gini, counts, depth, left, right):
@@ -29,11 +34,6 @@ class Leaf(_Node):
     @property
     def is_leaf(self):
         return True
-
-    def __eq__(self, other):
-        if other.is_leaf:
-            return self.value == other.value
-        return False
 
 
 def learn_tree(X, y, max_depth=5, min_split_size=10,
@@ -112,7 +112,7 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         left = learn(x_left, y_left, depth + 1)
         right = learn(x_right, y_right, depth + 1)
 
-        if left.is_leaf and right.is_leaf and left == right:
+        if left == right:
             return Leaf(left.value)
 
         return Node(feature=best_feature, value=best_value, counts=counts,
@@ -199,6 +199,25 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
     x_root_index = np.arange(X.shape[0])
     y_root_index = np.arange(y.shape[0])
     return learn(x_root_index, y_root_index, 0)
+
+
+def predict_tree(tree, X):
+    """
+    Makes a prediction for each sample of provided subset of data using
+    a single decision tree.
+    """
+
+    def predict(node, sample):
+        if node.is_leaf:
+            return node.value
+        feature, threshold = node.feature, node.value
+        if sample[feature] <= threshold:
+            return predict(node.left, sample)
+        else:
+            return predict(node.right, sample)
+
+    predictions = np.array([predict(tree, sample) for sample in X])
+    return predictions
 
 
 def mask(condition, arr):
