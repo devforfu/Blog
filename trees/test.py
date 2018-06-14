@@ -9,6 +9,13 @@ from plots import create_graph
 from decision_tree import learn_tree, predict_tree
 
 
+PALETTE = [
+    [167, 98, 228],
+    [74, 144, 226],
+    [244, 166, 35]
+]
+
+
 def read_csv(filename):
     with open(filename) as fp:
         reader = csv.reader(fp)
@@ -56,15 +63,15 @@ def encode_labels(y):
 def main():
     data_path = join(dirname(__file__), 'datasets', 'wine.csv')
     feature_names, X, y = read_csv(data_path)
-    y, encoder, class_names = encode_labels(y)
+    y, encoder, class_names = encode_labels(y.astype(int))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y)
-    tree = learn_tree(X_train, y_train)
+    tree = learn_tree(X_train, y_train, max_depth=2)
     preds = predict_tree(tree, X_test)
     acc = np.mean(y_test == preds)
     print(f'Test set accuracy: {acc:2.2%}')
 
-    dot_data = create_graph(tree, feature_names, class_names)
+    dot_data = create_graph(tree, feature_names, class_names, palette=PALETTE)
     graph = graphviz.Source(dot_data)
     graph.render('tree')
 

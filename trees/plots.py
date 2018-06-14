@@ -10,15 +10,20 @@ def node_id(size=20, chars=digits):
     return ''.join([random.choice(chars) for _ in range(size)])
 
 
-def create_graph(tree, feature_names, class_names, output_file=None):
+def create_graph(tree, feature_names, class_names, output_file=None,
+                 palette=None):
 
     styling = {
         'shape': 'box',
         'style': 'filled, rounded',
         'color': 'black'}
 
-    n_colors = len(class_names)
-    colors = _color_brew(n_colors)
+    if palette is None:
+        n_colors = len(class_names)
+        colors = _color_brew(n_colors)
+    else:
+        assert len(palette) == len(class_names)
+        colors = palette
 
 
     def create(node, file):
@@ -63,14 +68,15 @@ def create_graph(tree, feature_names, class_names, output_file=None):
 
     def get_node_color(node):
         if node.is_leaf:
-            return to_hexadecimal(colors[node.value])
+            color = colors[node.value]
         else:
             [(cls, count)] = node.counts.most_common(1)
             total = sum(node.counts.values())
             rgb = colors[cls]
             alpha = int(255 * count / total)
-            rgba = rgb + [alpha]
-            return to_hexadecimal(rgba)
+            color = rgb + [alpha]
+
+        return to_hexadecimal(color)
 
 
     opened_file = False
