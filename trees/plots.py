@@ -11,7 +11,7 @@ def node_id(size=20, chars=digits):
 
 
 def create_graph(tree, feature_names, class_names, output_file=None,
-                 palette=None):
+                 palette=None, title=None):
 
     styling = {
         'shape': 'box',
@@ -88,8 +88,11 @@ def create_graph(tree, feature_names, class_names, output_file=None,
             opened_file = True
         styles = [f'{k}="{v}"' for k, v in styling.items()]
         fp.write('digraph Tree {\n')
-        fp.write('bgcolor="#00000000"\n')
+        fp.write('bgcolor="#00000000";\n')
         fp.write('node [%s];\n' % ', '.join(styles))
+        if title is not None:
+            fp.write('labelloc="t";\n')
+            fp.write(f'label="{title}";\n')
         create(tree, fp)
         fp.write('}')
         return fp.getvalue()
