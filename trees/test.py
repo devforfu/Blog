@@ -66,14 +66,14 @@ def main():
     y, encoder, class_names = encode_labels(y.astype(int))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y)
-    tree = learn_tree(X_train, y_train, max_depth=2)
+    tree = learn_tree(X_train, y_train, max_depth=5)
     preds = predict_tree(tree, X_test)
     acc = np.mean(y_test == preds)
     print(f'Test set accuracy: {acc:2.2%}')
 
     dot_data = create_graph(tree, feature_names, class_names, palette=PALETTE)
-    graph = graphviz.Source(dot_data)
-    graph.render('tree')
+    graph = graphviz.Source(dot_data, format='png')
+    graph.render('tree.dot')
 
 
 if __name__ == '__main__':

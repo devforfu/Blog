@@ -88,6 +88,7 @@ def create_graph(tree, feature_names, class_names, output_file=None,
             opened_file = True
         styles = [f'{k}="{v}"' for k, v in styling.items()]
         fp.write('digraph Tree {\n')
+        fp.write('bgcolor="#00000000"\n')
         fp.write('node [%s];\n' % ', '.join(styles))
         create(tree, fp)
         fp.write('}')
