@@ -203,7 +203,7 @@ def learn_tree(X, y, max_depth=5, min_split_size=10,
         """
         Checks if leaf split generates enough instances in the child node.
 
-        Note that `index` array is a boolean mask which selects a subset of
+        Note that "index" array is a boolean mask which selects a subset of
         parent nodes to group them into child node. True values select values
         of left node, while False values - for the right one.
         """
