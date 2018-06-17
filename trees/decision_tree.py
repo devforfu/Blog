@@ -1,9 +1,15 @@
+"""
+Simple decision tree implementation using Numpy.
+"""
 from collections import Counter
 
 import numpy as np
 
 
 class _Node:
+    """
+    Internal structure representing a general Node type.
+    """
     def __init__(self, value):
         self.value = value
 
@@ -18,6 +24,13 @@ class _Node:
 
 
 class Node(_Node):
+    """
+    Structure representing inner nodes of a decision tree.
+
+    Each inner node should have two branches, a dataset feature column index,
+    threshold value and a couple of additional parameters helpful for
+    visualization purposes or inspecting learned tree properties.
+    """
     def __init__(self, feature, value, gini, counts, depth, left, right):
         super().__init__(value)
         self.feature = feature
@@ -30,7 +43,12 @@ class Node(_Node):
 
 
 class Leaf(_Node):
+    """
+    Leaf node of decision tree.
 
+    The leaf nodes doesn't have branches and their value represents a predicted
+    class.
+    """
     @property
     def is_leaf(self):
         return True
