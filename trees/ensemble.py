@@ -70,10 +70,10 @@ class RandomForestClassifier(LoggingMixin):
         n = self.n_trees
 
         self.info(f'Started building an ensemble of {n} decision trees')
-        self.info(f'Training dataset shape: {X.shape:s}')
-        self.info(f'Maximal tree depth: {self.max_depth:d}')
+        self.info(f'Training dataset shape: {X.shape}')
+        self.info(f'Maximal tree depth: {self.max_depth}')
         self.info(f'Minimal number of samples per node '
-                  f'to make a split: {self.min_split_size:d}')
+                  f'to make a split: {self.min_split_size}')
         self.info(f'Minimal number of samples '
                   f'to create a leaf: {self.min_leaf_size}')
         self.info(f'Number of random features considered '
@@ -93,8 +93,11 @@ class RandomForestClassifier(LoggingMixin):
                 features_subset_size=m)
             ensemble.append(tree)
 
+        classes = np.unique(y)
+        classes.sort()
+
         self.ensemble_ = ensemble
-        self.classes_ = np.unique(y).sort()
+        self.classes_ = classes
         self.n_classes_ = len(self.classes_)
         return self
 
@@ -105,13 +108,18 @@ class RandomForestClassifier(LoggingMixin):
         if self.ensemble_ is None:
             raise RuntimeError('fit method should be called at first')
 
-        probabilities = np.zeros((X.shape[0], self.n_classes_))
+        predictions = np.zeros((X.shape[0], self.n_trees), dtype=int)
+        for tree_index, tree in enumerate(self.ensemble_):
+            predictions[:, tree_index] = self.predict_fn(tree, X)
 
-        for i, tree in enumerate(self.ensemble_):
-            single_tree_predictions = self.predict_fn(tree, X)
-            counts = np.bincount(single_tree_predictions)
+        probabilities = np.zeros((X.shape[0], self.n_classes_), dtype=float)
+        for sample_index in range(X.shape[0]):
+            preds = predictions[sample_index, :]
+            counts = np.zeros(self.n_classes_)
+            for value in preds:
+                counts[value] += 1
             ratios = counts / counts.sum()
-            probabilities[i, :] = ratios
+            probabilities[sample_index, :] = ratios
 
         return probabilities
 

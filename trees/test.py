@@ -55,7 +55,7 @@ def test_creating_an_ensemble_of_trees(wine_dataset):
 
     random_forest = RandomForestClassifier(
         tree_funcs=(learn_tree, predict_tree),
-        n_trees=1000, max_depth=1, min_leaf_size=5,
+        n_trees=10, max_depth=1, min_leaf_size=5,
         min_split_size=10, feature_subset_size='sqrt')
     preds = random_forest.fit(X_train, y_train).predict(X_test)
     acc = np.mean(y_test == preds)
