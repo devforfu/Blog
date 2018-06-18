@@ -5,6 +5,7 @@ import graphviz
 import numpy as np
 
 from plots import create_graph
+from ensemble import RandomForestClassifier
 from decision_tree import learn_tree, predict_tree
 from utils import read_csv, encode_labels, train_test_split
 
@@ -45,6 +46,21 @@ def test_creating_set_of_trees(trial, wine_dataset):
         palette=PALETTE, title=f'Tree accuracy: {acc:2.2%}')
     graph = graphviz.Source(dot_data, format='png')
     graph.render('tree_%d' % trial)
+
+
+def test_creating_an_ensemble_of_trees(wine_dataset):
+    feature_names, X, y = wine_dataset
+    y, encoder, class_names = encode_labels(y.astype(int))
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+    random_forest = RandomForestClassifier(
+        tree_funcs=(learn_tree, predict_tree),
+        n_trees=1000, max_depth=1, min_leaf_size=5,
+        min_split_size=10, feature_subset_size='sqrt')
+    preds = random_forest.fit(X_train, y_train).predict(X_test)
+    acc = np.mean(y_test == preds)
+
+    print(f'Test set accuracy: {acc:2.2%}')
 
 
 def compute_accuracy(tree, X_test, y_test):
