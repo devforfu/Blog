@@ -101,17 +101,30 @@ class RandomForestClassifier(LoggingMixin):
         self.n_classes_ = len(self.classes_)
         return self
 
-    def predict_proba(self, X):
+    def predict_decisions(self, X, n_trees=None):
+        """
+        Returns matrix with predicted classes for each 
+        instance for each of trees in ensemble.
+        """
+        if self.ensemble_ is None:
+            raise RuntimeError('fit method should be called first')
+            
+        if n_trees is None:
+            n_trees = self.n_trees
+        elif n_trees > self.n_trees:
+            n_trees = self.n_trees    
+            
+        predictions = np.zeros((X.shape[0], n_trees), dtype=int)
+        for tree_index, tree in enumerate(self.ensemble_[:n_trees]):
+            predictions[:, tree_index] = self.predict_fn(tree, X)
+        
+        return predictions
+        
+    def predict_proba(self, X, **params):
         """
         Returns matrix with probabilities per instance per class.
         """
-        if self.ensemble_ is None:
-            raise RuntimeError('fit method should be called at first')
-
-        predictions = np.zeros((X.shape[0], self.n_trees), dtype=int)
-        for tree_index, tree in enumerate(self.ensemble_):
-            predictions[:, tree_index] = self.predict_fn(tree, X)
-
+        predictions = self.predict_decisions(X, **params)
         probabilities = np.zeros((X.shape[0], self.n_classes_), dtype=float)
         for sample_index in range(X.shape[0]):
             preds = predictions[sample_index, :]
@@ -123,11 +136,11 @@ class RandomForestClassifier(LoggingMixin):
 
         return probabilities
 
-    def predict(self, X):
+    def predict(self, X, **params):
         """
         Returns a vector with class predictions.
         """
-        probabilities = self.predict_proba(X)
+        probabilities = self.predict_proba(X, **params)
         labels = probabilities.argmax(axis=1)
         return labels
 

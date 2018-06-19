@@ -22,13 +22,23 @@ def train_test_split(X, y, train_size=0.8):
     n = X.shape[0]
     counts = Counter(y)
     classes, probs = zip(*[(k, v/n) for k, v in counts.items()])
+    n_classes = len(classes)
     n_train = int(n * train_size)
 
-    index = np.arange(n)
-    sample = np.random.choice(classes, size=n_train, replace=True, p=probs)
-    samples_per_class = np.bincount(sample.astype(int))
-    train_samples = []
+    sample = np.random.choice(
+        classes, size=n_train,
+        replace=True, p=probs).astype(int)
 
+    samples_per_class = np.zeros(n_classes, dtype=int)
+
+    for value in sample:
+        samples_per_class[value] += 1
+
+    for i in range(n_classes):
+        samples_per_class[i] = max(samples_per_class[i], 1)
+
+    index = np.arange(n)
+    train_samples = []
     for label, n_samples in enumerate(samples_per_class):
         subset = np.random.choice(
             index[y == label], size=n_samples, replace=False)
