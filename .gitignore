@@ -111,3 +111,4 @@ ENV/
 *.gz2
 *.npy
 *~
+*.pickle

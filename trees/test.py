@@ -63,15 +63,6 @@ def test_creating_an_ensemble_of_trees(wine_dataset):
     print(f'Test set accuracy: {acc:2.2%}')
 
 
-def test_split():
-    X = np.load('dataset.npy')
-    y = np.load('targets.npy')
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7)
-
-    assert set(y_train) == set(y_test)
-
-
 def compute_accuracy(tree, X_test, y_test):
     preds = predict_tree(tree, X_test)
     acc = np.mean(y_test == preds)

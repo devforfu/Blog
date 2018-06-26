@@ -1,6 +1,7 @@
 from os.path import join
 
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 from quantization import quantize
 from decision_tree import learn_tree
@@ -15,7 +16,7 @@ def main():
     X, labels = quantize(dataset_path, n_clusters)
     y, encoder, classes = encode_labels(labels)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7)
 
     random_forest = RandomForestClassifier(
         tree_funcs=(learn_tree, predict_tree),

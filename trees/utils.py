@@ -17,31 +17,17 @@ def read_csv(filename):
 
 
 def train_test_split(X, y, train_size=0.8):
-    assert X.shape[0] == y.shape[0]
+    from collections import Counter
 
-    n = X.shape[0]
-    counts = Counter(y)
-    classes, probs = zip(*[(k, v/n) for k, v in counts.items()])
-    n_classes = len(classes)
-    n_train = int(n * train_size)
+    samples_per_class = Counter(y)
 
-    sample = np.random.choice(
-        classes, size=n_train,
-        replace=True, p=probs).astype(int)
-
-    samples_per_class = np.zeros(n_classes, dtype=int)
-
-    for value in sample:
-        samples_per_class[value] += 1
-
-    for i in range(n_classes):
-        samples_per_class[i] = max(samples_per_class[i], 1)
-
-    index = np.arange(n)
+    index = np.arange(X.shape[0])
     train_samples = []
-    for label, n_samples in enumerate(samples_per_class):
+
+    for value, count in samples_per_class.items():
+        n_samples = int(count * train_size)
         subset = np.random.choice(
-            index[y == label], size=n_samples, replace=False)
+            index[y == value], size=n_samples, replace=False)
         train_samples.extend(subset)
 
     train_samples = np.array(train_samples)
