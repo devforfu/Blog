@@ -4,10 +4,12 @@ from os.path import exists, join, basename, isdir
 
 import numpy as np
 
-from sklearn.pipeline import Pipeline
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import make_pipeline
+from sklearn.base import TransformerMixin, clone
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 
 class AccelerometerDatasetReader:
@@ -60,12 +62,63 @@ class AccelerometerDatasetReader:
         return self.samples_, self.targets_
 
 
+class BatchTransformer(TransformerMixin):
+
+    def __init__(self, base_transformer):
+        self.base_transformer = base_transformer
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, batch, y=None):
+        if y is not None:
+            raise ValueError(
+                'cannot apply batch transformer in supervised fashion')
+
+        transformed = []
+        for record in batch:
+            transformer = clone(self.base_transformer)
+            transformed.append(transformer.fit_transform(record))
+
+        return transformed
+
+
+class KMeansQuantization(TransformerMixin):
+
+    def __init__(self, k=5):
+        self.k = k
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        features = []
+
+        for record in X:
+            kmeans = KMeans(n_clusters=self.k)
+            kmeans.fit_transform(record)
+            feature_vector = kmeans.cluster_centers_.flatten()
+            features.append(feature_vector)
+
+        return np.array(features)
+
+
 def main():
     root = join('datasets', 'adl')
     reader = AccelerometerDatasetReader()
     reader.read(root)
     X, y = reader.dataset
-    assert len(X) == len(y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y)
+
+    pipeline = make_pipeline(
+        BatchTransformer(StandardScaler()),
+        KMeansQuantization(k=3),
+        RandomForestClassifier(n_estimators=1000))
+    pipeline.fit(X_train, y_train)
+    y_preds = pipeline.predict(X_test)
+
+    acc = np.mean(y_preds == y_test)
+    print(f'Dataset accuracy: {acc:2.2%}')
 
 
 if __name__ == '__main__':
