@@ -1,7 +1,6 @@
 from os.path import join
 
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 from quantization import quantize
 from decision_tree import learn_tree
@@ -23,9 +22,11 @@ def main():
         n_trees=50, max_depth=3, min_leaf_size=5,
         min_split_size=10, feature_subset_size='sqrt')
 
-    preds = random_forest.fit(X_train, y_train).predict(X_test)
-    acc = np.mean(preds == y_test)
-    print(f'Accelerometer dataset accuracy: {acc:2.2%}')
+    random_forest.fit(X_train, y_train)
+    predictions = random_forest.predict(X_test)
+    acc = np.mean(predictions == y_test)
+
+    print(f'Test dataset predictions accuracy: {acc:2.2%}')
 
 
 if __name__ == '__main__':
