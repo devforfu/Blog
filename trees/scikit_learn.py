@@ -4,10 +4,10 @@ from os.path import exists, join, basename, isdir
 
 import numpy as np
 
-from sklearn.pipeline import make_pipeline
-from sklearn.base import TransformerMixin, clone
-from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.cluster import KMeans
+from sklearn.pipeline import make_pipeline
+from sklearn.base import BaseEstimator, TransformerMixin, clone
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
@@ -62,7 +62,7 @@ class AccelerometerDatasetReader:
         return self.samples_, self.targets_
 
 
-class BatchTransformer(TransformerMixin):
+class BatchTransformer(BaseEstimator, TransformerMixin):
 
     def __init__(self, base_transformer):
         self.base_transformer = base_transformer
@@ -83,7 +83,7 @@ class BatchTransformer(TransformerMixin):
         return transformed
 
 
-class KMeansQuantization(TransformerMixin):
+class KMeansQuantization(BaseEstimator, TransformerMixin):
 
     def __init__(self, k=5):
         self.k = k
