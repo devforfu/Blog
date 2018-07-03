@@ -56,6 +56,13 @@ class AccelerometerDatasetReader:
         self.samples_ = samples
         self.targets_ = encoder.fit_transform(targets)
         self.encoder_ = encoder
+        
+    @property
+    def verbose_classes(self):
+        classes = [
+            class_name.replace('_', ' ').title() 
+            for class_name in self.encoder_.classes_]
+        return classes
 
     @property
     def dataset(self):
@@ -101,7 +108,7 @@ class KMeansQuantization(BaseEstimator, TransformerMixin):
             features.append(feature_vector)
 
         return np.array(features)
-
+    
 
 def main():
     root = join('datasets', 'adl')
