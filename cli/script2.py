@@ -6,22 +6,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-p',
-        required=True,
+        dest='points', metavar='PTS', required=True,
         help='List of points to plot'
     )
     parser.add_argument(
         '-sz',
-        default='8x6',
-        help='Canvas size'
+        dest='canvas_size', metavar='SZ', default='8x6',
+        help='Canvas size (default: %(default)s)'
     )
     parser.add_argument(
         '-o', '--out',
         default='output.png',
-        help='Path to the output image file'
+        help='Path to the output image file (default: %(default)s)'
     )
     args = parser.parse_args()
-    xs, ys = parse_points(args.p)
-    f, ax = plt.subplots(1, 1, figsize=[int(x) for x in args.sz.split('x')])
+    xs, ys = parse_points(args.points)
+    f, ax = plt.subplots(1, 1, figsize=[int(x) for x in args.canvas_size.split('x')])
     ax.scatter(xs, ys)
     f.savefig(args.out, format='png')
 
