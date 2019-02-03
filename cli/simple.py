@@ -40,12 +40,11 @@ def main():
 
     xs, ys = parse_points(args.points)
     f, ax = plt.subplots(1, 1, figsize=[int(x) for x in args.canvas_size.split('x')])
-    ax.set_aspect('equal')
     if args.hide_axes:
-        ax.show_axis_off()
+        ax.set_axis_off()
     if args.show_grid:
         ax.grid(True)
-    ax.scatter(xs, ys)
+    ax.plot(xs, ys)
     fmt = args.image_format
     f.tight_layout()
     f.savefig(f'{args.out}.{fmt}', format=fmt)

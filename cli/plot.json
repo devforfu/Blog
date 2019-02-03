@@ -1,0 +1,11 @@
+{
+  "points": [
+    [1, 2, 3, 4, 5],
+    [1, 4, 9, 16, 25]
+  ],
+  "canvas_size": [8, 6],
+  "show_grid": true,
+  "hide_axes": false,
+  "image_format": "pdf",
+  "out": "plot"
+}

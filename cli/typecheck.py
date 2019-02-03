@@ -41,12 +41,11 @@ def main():
     args = parser.parse_args()
 
     f, ax = plt.subplots(1, 1, figsize=args.canvas_size)
-    ax.scatter(*args.points)
-    ax.set_aspect('equal')
     if args.hide_axes:
-        ax.show_axis_off()
+        ax.set_axis_off()
     if args.show_grid:
         ax.grid(True)
+    ax.plot(*args.points)
     fmt = args.image_format
     f.tight_layout()
     f.savefig(f'{args.out}.{fmt}', format=fmt)
