@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, ArgumentError, ArgumentTypeError
+from functools import partial
 import json
 from os.path import exists
 import matplotlib.pyplot as plt
@@ -82,7 +83,11 @@ def create_parser():
     json_cmd.add_argument(
         '-j', '--json',
         required=True,
-        dest='config', type=json_file,
+        dest='config', type=partial(load_json_file, default={
+            'canvas_size': [8, 6],
+            'show_grid': True,
+            'hide_axes': False
+        }),
         help='Path to json file'
     )
 
@@ -114,14 +119,21 @@ def canvas_dimensions(value: str) -> tuple:
         raise ArgumentTypeError('should have format: 3x4')
 
 
-def json_file(value: str) -> str:
-    """Ensures that file exists and contains valid JSON object."""
+def load_json_file(value: str, default: dict=None) -> str:
+    """Ensures that file exists and contains valid JSON object.
 
+    If the `default` parameter is provided, fills the keys missing in the
+    loaded JSON object with the keys from the `default` dictionary.
+    """
     if not exists(value):
         raise ArgumentError(value, 'file doesn\'t exist')
     try:
         with open(value) as file:
             content = json.load(file)
+        if default is not None:
+            for key, value in default.items():
+                if key not in content:
+                    content[key] = value
         return content
     except json.JSONDecodeError:
         raise ArgumentTypeError('invalid JSON file')
